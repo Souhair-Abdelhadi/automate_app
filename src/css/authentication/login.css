@@ -1,0 +1,132 @@
+/* login styles  */
+
+.loginBody {
+
+    background: url("../../images/login_bg.jpg") no-repeat fixed center ; 
+    background-size: cover;
+    height: 100vh;
+    width: 100%;
+  
+  }
+  .login_modal {
+    position: absolute;
+    margin-left: 25%;
+    background-color: rgba(17, 12, 15, 0.9);
+    width: 50%;
+    height: 60%;
+    margin-top: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+ 
+  .login_modal h2 {
+    color: #fff;
+    font-size: 30px;
+    margin-left: 40%;
+    margin-bottom: 2%;
+  }
+  #email {
+    font-size: 18px ;
+    font-weight: lighter;
+    color: "#fff" ;
+  }
+
+  #password {
+    font-size: 18px ;
+    font-weight: lighter;
+    color: "#fff" ;
+  }
+
+  .login_modal label{
+    display: block;
+    margin: 10px 5px;
+    color: white;
+  }
+  
+  .input {
+    position: absolute;
+    padding: 5px 60px;
+    font-size: 20px;
+    margin-top: 5px;
+    left: 20%;
+  }
+  .input:focus {
+  
+    border: 3px solid  seagreen;
+    color : white;
+    border-radius: 10px;
+    background-color: black ;
+  }
+  
+  .input:hover {
+  
+    border: 3px solid seagreen;
+    background-color: black;
+    color : white;
+    border-radius: 10px;
+    transition: 300ms;
+  
+  }
+  .login_modal button {
+  
+    padding: 5px 30px ;
+    display: block;
+    margin-top: 30px;
+    margin-left: 35%;
+    background-color: rgba(9, 9, 24, 0.4);
+    color:  white;
+    font-size: 18px;
+    border-radius: 15px;
+    opacity: 0.7;
+  
+  }
+  
+  .login_modal button:hover {
+    background-color: rgba(9, 9, 24, 0.8);
+    opacity: 1;
+    border-color: white;
+    transition: 500ms;
+  
+  }
+
+  .login_modal_height {
+
+    height: 400px !important;
+    width: 800px !important;
+
+
+  }
+  .submit_elem {
+    margin-top: 3%;
+    margin-left: 40%;
+  }
+  .login_modal_header {
+    background-color: rgba(67, 140, 235, 0.692);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .login_modal_title {
+    font-size: 20px !important;
+    font-weight: bold;
+    margin-left: 40%;
+  }
+  .login_error_message{
+    font-size: 16px ;
+    font-weight: bold;
+    color: red;
+
+  }
+
+  .login_input {
+    width: 60%;
+  }
+
+  .center_elems{
+  margin-top: 5% !important;
+  margin-left: 30% !important;
+ 
+
+  }
