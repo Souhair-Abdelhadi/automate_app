@@ -1,0 +1,41 @@
+.test1  {
+    background-color: black;
+    height: 100vh;
+}
+
+.description_modal {
+    
+    width: 60%;
+    background-color: white;
+    left: 20%;
+    top : 20%;
+    position: absolute;
+    z-index: 500;
+    
+}
+
+.description_modal h4 {
+    background-color: #021B40;
+    height: 40px;
+    color: white;
+    font-size: 25px;
+    padding-top: 3px;
+
+}
+
+.description_text {
+   
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    padding-left: 5px;
+    padding-right: 3px;
+}
+
+.description_text p {
+    font-size: 18px;
+    color: black;
+    
+
+}

@@ -4,8 +4,9 @@ import {FaEye,FaEyeSlash} from "react-icons/fa"
 import $ from 'jquery'
 import validator from "validator";
 import {Modal,Button,Form} from "react-bootstrap"
+import { withRouter } from '../../js/withRouter'
 
-export default class Test extends React.Component {
+class Test extends React.Component {
 
     state =  {
         email : '',
@@ -56,8 +57,11 @@ export default class Test extends React.Component {
                     if(data.status == "OK"){
                         localStorage.setItem('access_token',data.access_token);
                         localStorage.setItem('refresh_token',data.refresh_token);
-                        localStorage.setItem('email',this.state.email )
-                        console.log(localStorage.getItem('email'))
+                        localStorage.setItem('user',JSON.stringify(data.user))
+                        localStorage.setItem("isAuthenticated",true )
+                        console.log(localStorage.getItem('email'),localStorage.getItem('isAuthenticated'))
+                        this.props.navigate("/automates")
+
                     }
                     else if( data.status == "LOGIN_ERROR")  {
                         this.setState({error : data.message})
@@ -180,3 +184,4 @@ export default class Test extends React.Component {
   }
 }
 
+export default withRouter(Test)

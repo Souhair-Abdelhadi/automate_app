@@ -10,20 +10,24 @@ class SideBar extends Component {
     return (
         <div className="sidebar_grid">
             <div className="sidebar_container" >
-                <GiExitDoor className="exit_icon" />
+                <GiExitDoor className="exit_icon" title="Logout" onClick={()=> {
+                    localStorage.setItem("isAuthenticated",false)
+                    this.props.navigate("/")
+                } }  />
                 <div >
                     <Nav defaultActiveKey="/home" className="flex-column nav_scroll"
                         navbarScroll={true} style={{ left: 0 }} >
                         <div className="profile">
-                            <img src="https://flyclipart.com/thumb2/download-person-free-vector-png-137844.png" alt="user image" className="user_image" />
-                            <div className="user_name_email" >
-                                <p>SOUHAIR abdelhadi</p>
-                                <p>souhairabdelhadi@gmail.Com</p>
+                            <div className="user_name_email" > 
+                                <p> BONJOUR :   </p>
+                                <p> {  JSON.parse(localStorage.getItem("user")).nomIng ? JSON.parse(localStorage.getItem("user")).nomIng.toUpperCase() : "" }  </p>
+                                <p>{JSON.parse(localStorage.getItem("user")).email}</p>
                             </div>
 
                         </div>
                         <Link className="item" to="/automates">Automates</Link>
-                        <Link className="item" to="/clients">Clients</Link>
+                        { typeof JSON.parse(localStorage.getItem('user')).admin != 'undefined' && JSON.parse(localStorage.getItem('user')).admin === 1 ? <Link className="item" to="/ingenieurs">Ingenieurs</Link> : null}    
+                        { typeof JSON.parse(localStorage.getItem('user')).admin != 'undefined' && JSON.parse(localStorage.getItem('user')).admin === 1 ? <Link className="item" to="/clients">Clients</Link> : null}    
                         <Link className="item" to="/interventions">Intervention</Link>
                         <Link className="item" to="/piece_rechange">Piece de rechange</Link>
                     </Nav>

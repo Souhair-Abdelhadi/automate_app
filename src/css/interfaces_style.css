@@ -1,18 +1,22 @@
 tbody {
     display: block;
     max-height: 350px;
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 thead, tbody tr {
     display: table;
     width: 100%;
     table-layout: fixed;
 }
+
 thead {
-    width: calc( 100% - 1.5em ) 
+    width: calc( 100% - 1.5em );
+    
 }
+
 td,th {
     font-size: 16px;
+    word-wrap:break-word
 }
 .interface_header {
     background-color: #021B40;
@@ -20,7 +24,7 @@ td,th {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-bottom: 5px solid red;
+    box-shadow: 0px 3px black;
 }
 #header_text {
     font-size: 45px;
@@ -204,4 +208,41 @@ td,th {
     font-size: 16px;
     color: red;
     transition: 300ms ease-in-out;
+}
+
+.description_modal {
+    
+    width: 60%;
+    background-color: white;
+    left: 20%;
+    top : 20%;
+    position: absolute;
+    z-index: 500;
+    
+}
+
+.description_modal h4 {
+    background-color: #021B40;
+    height: 40px;
+    color: white;
+    font-size: 25px;
+    padding-top: 3px;
+
+}
+
+.description_text {
+   
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    padding-left: 5px;
+    padding-right: 3px;
+}
+
+.description_text p {
+    font-size: 18px;
+    color: black;
+    
+
 }

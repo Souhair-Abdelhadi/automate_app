@@ -5,8 +5,9 @@ import SideBar from './cards/sideBar'
 import {AiFillCloseCircle} from "react-icons/ai"
 import $ from 'jquery'
 import { withRouter } from '../js/withRouter'
+import getData from '../api/getData'
 
- class ShowAutomates extends Component {
+class ShowAutomates extends Component {
 
     constructor(props){
         super(props)
@@ -15,24 +16,10 @@ import { withRouter } from '../js/withRouter'
             automates_liste : [],
             liste_loaded : false,
             src : null,
-            list_to_show : []
+            list_to_show : [],
+            imageOpened : false,
         }
-        for(var i=1; i<= 15; i++){
-            var obj = {
-                id : i,
-                labo : "Labo"+i,
-                ingenieur : "Ingénieur"+i,
-                nom_automate	: "Nom automate	"+i,
-                marque_automate : "Marque automate	"+i,
-                image : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSie8A8YLcuD4wg6pVY2mOX46T4DELiI-gITA&usqp=CAU",
-
-            }
-            this.state.automates_liste.push(obj)
-            this.setState({list_to_show : [...this.state.automates_liste]})
-            if( i == 15){
-                this.setState({liste_loaded : true})
-            }
-        }
+        
     }
 
     redirect(path){
@@ -40,13 +27,39 @@ import { withRouter } from '../js/withRouter'
     }
 
     toggleImage = (src) => {
-        this.setState({src : src})
+        if(!this.state.imageOpened){
+            var binary = '';
+            var bytes = new Uint8Array( src.data );
+            var len = bytes.byteLength;
+            for (var i = 0; i < len; i++) {
+                binary += String.fromCharCode( bytes[ i ] );
+            }
+            console.log("binary :",binary)
+            this.setState({src : binary})
+            this.setState({imageOpened : true})
+        }
+       else {
+           this.setState({imageOpened : false})
+       }
         $('#image_div').toggle('slow')
     }
 
     componentDidMount(){
-        console.log(this.state.automates_liste)
-        this.setState({list_to_show : [...this.state.automates_liste]})
+        const data = getData("automates?email="+JSON.parse(localStorage.getItem("user")).email,null,"get")
+        data.then((res)=>{
+            console.log(res)
+            if(res.status == "OK"){
+                this.setState({list_to_show : res.doc})
+            }
+            else {
+                this.setState({list_to_show : []})
+            }
+        })
+        .catch(e=>{
+            console.log(e.message)
+            this.setState({list_to_show : []})
+        })
+        
     }
 
   render() {
@@ -99,6 +112,7 @@ import { withRouter } from '../js/withRouter'
                                 <th>Ingénieur</th>
                                 <th>Nom automate</th>
                                 <th>Marque automate</th>
+                                <th>Traiter</th>
                                 <th>Image</th>
                                 <th>Les actions</th>
                             </tr>
@@ -107,11 +121,12 @@ import { withRouter } from '../js/withRouter'
                             {this.state.list_to_show.map((value,index)=>{
                                 return (
                                     <tr key={index} >
-                                        <td>{value.id}</td>
-                                        <td>{value.labo}</td>
-                                        <td>{value.ingenieur}</td>
-                                        <td>{value.nom_automate}</td>
-                                        <td>{value.marque_automate}</td>
+                                        <td>{value.idAutomate}</td>
+                                        <td>{value.idLabo}</td>
+                                        <td>{value.id_ing}</td>
+                                        <td>{value.nomAutomate}</td>
+                                        <td>{value.marqueAutomate}</td>
+                                        <td>{value.traiter === 1 ? "Oui" : "Non" }</td>
                                         <td>
                                             <Button variant="primary" onClick={() => this.toggleImage(value.image)} >Voir</Button>
                                         </td>

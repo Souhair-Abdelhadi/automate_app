@@ -5,6 +5,7 @@ import SideBar from './cards/sideBar'
 import {AiFillCloseCircle} from "react-icons/ai"
 import $ from 'jquery'
 import { withRouter } from '../js/withRouter'
+import getData from "../api/getData"
 
 class Clients extends Component {
 
@@ -16,28 +17,39 @@ class Clients extends Component {
             src : null,
             list_to_show : []
         }
-        for(var i=1; i<= 15; i++){
-            var obj = {
-                id : i,
-                nom_labo : "Labo "+i,
-                ville : "Ville "+i,
-                adresse	: "adresse "+i
 
-            }
-            this.state.clients_liste.push(obj)
-            this.setState({list_to_show : [...this.state.clients_liste]})
-            if( i == 15){
-                this.setState({liste_loaded : true})
-            }
-        }
+        // for(var i=1; i<= 15; i++){
+        //     var obj = {
+        //         id : i,
+        //         nom_labo : "Labo "+i,
+        //         ville : "Ville "+i,
+        //         adresse	: "adresse "+i
+
+        //     }
+        //     this.state.clients_liste.push(obj)
+        //     this.setState({list_to_show : [...this.state.clients_liste]})
+        //     if( i == 15){
+        //         this.setState({liste_loaded : true})
+        //     }
+        // }
     }
 
     
 
 
     componentDidMount(){
-        console.log(this.state.clients_liste)
-        this.setState({list_to_show : [...this.state.clients_liste]})
+
+        const data = getData("clients",null,"get")
+        data.then((res)=>{
+            if(res.status == "OK"){
+                this.setState({list_to_show : res.doc})
+            }
+            else{
+                console.log(res.message)
+            }
+        })
+        .catch(e=>console.log(e))
+        
     }
 
   render() {
@@ -84,6 +96,7 @@ class Clients extends Component {
                             <tr>
                                 <th>id </th>
                                 <th>Nom labo</th>
+                                <th>Num téléphone</th>
                                 <th>Ville</th>
                                 <th>Adresse</th>
                                 <th>Les actions</th>
@@ -93,8 +106,9 @@ class Clients extends Component {
                             {this.state.list_to_show.map((value,index)=>{
                                 return (
                                     <tr key={index} >
-                                        <td>{value.id}</td>
+                                        <td>{value.idLabo}</td>
                                         <td>{value.nom_labo}</td>
+                                        <td>{"0"+value.numPhone}</td>
                                         <td>{value.ville}</td>
                                         <td>
                                             {value.adresse}

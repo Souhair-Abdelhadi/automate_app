@@ -4,6 +4,8 @@ import {Form,Button,InputGroup,FormControl,Row} from "react-bootstrap"
 import SideBar from './cards/sideBar'
 import {AiFillCloseCircle} from "react-icons/ai"
 import $ from 'jquery'
+import getData from '../api/getData'
+import postData from '../api/postData'
 
 export default class Ajouter_Automate extends Component {
 
@@ -11,8 +13,8 @@ export default class Ajouter_Automate extends Component {
         super(props)
         this.state = {
             validated : false,
-            id_labo : '',
-            id_ing : '',
+            idLabo : '',
+            idIng : '',
             nom_automate : '',
             marque_automate : '',
             src : '',
@@ -22,22 +24,22 @@ export default class Ajouter_Automate extends Component {
             labo_list_to_show : [],
         }
 
-        for(var i = 1; i <= 10; i++){
-            this.state.ing_list.push({
-                id : i,
-                nom : "ing "+i
-            })
-            this.setState({ing_list_to_show : [...this.state.ing_list] })
+        // for(var i = 1; i <= 10; i++){
+        //     this.state.ing_list.push({
+        //         id : i,
+        //         nom : "ing "+i
+        //     })
+        //     this.setState({ing_list_to_show : [...this.state.ing_list] })
             
-        }
+        // }
 
-        for(var i = 1; i <= 10; i++){
-            this.state.labo_list.push({
-                id : i,
-                nom : "labo "+i
-            })
-            this.setState({labo_list_to_show : [...this.state.labo_list] })
-        }
+        // for(var i = 1; i <= 10; i++){
+        //     this.state.labo_list.push({
+        //         id : i,
+        //         nom : "labo "+i
+        //     })
+        //     this.setState({labo_list_to_show : [...this.state.labo_list] })
+        // }
 
     }
 
@@ -91,29 +93,38 @@ export default class Ajouter_Automate extends Component {
             headers.append('Accept', 'application/json');
             headers.append('Origin','http://localhost:3000');
             headers.append('Authorization','bearer '+localStorage.getItem('access_token'))
-
-            fetch('http://localhost:3001/ajouter_client',{
-                mode :'cors',
-                method : 'POST',
-                headers : headers,
-                body : JSON.stringify({
-                    nom_labo : "",
-                    ville : this.state.ville,
-                    adresse : this.state.adresse,
-                })
+            const dataPromise = postData("ajouter_automate",{
+                idLabo : this.state.idLabo,
+                    idIng : this.state.idIng,
+                    nom_automate : this.state.nom_automate,
+                    marque_automate : this.state.marque_automate,
+                    image : this.state.src
             })
-            .then((res)=>{
+            // fetch('http://localhost:3001/ajouter_automate',{
+            //     mode :'cors',
+            //     method : 'POST',
+            //     headers : headers,
+            //     body : JSON.stringify({
+            //         idLabo : this.state.idLabo,
+            //         idIng : this.state.idIng,
+            //         nom_automate : this.state.nom_automate,
+            //         marque_automate : this.state.marque_automate,
+            //         image : this.state.src
+            //     })
+            // })
+            dataPromise.then((res)=>{
                 if(res.status === 400) {
                     $('#error_message').css("color","red")
                     $('#error_message').text("Les données envoyer ne sont pas complete!")
                     .fadeIn("slow")
                 }
-                else if ( res.status === 200 ){
+                else if ( res.status === 200  ){
                     $('#error_message').css("color","#021B40")
                     res.json().then((data)=>{
                         console.log(data)
                         $('#error_message').text(data.message)
                         .fadeIn("slow")
+                        $('#form').trigger('reset')
                     })
                     .catch(e => console.log(e))
                 }
@@ -136,7 +147,7 @@ export default class Ajouter_Automate extends Component {
         if(nom){
             var list = this.state.labo_list.filter((value,index)=>{
                 
-                if(value.nom.toLowerCase().search(nom.toLowerCase()) != -1){
+                if(value.nom_labo.toLowerCase().search(nom.toLowerCase()) != -1){
                     return value
                     
                 }
@@ -154,7 +165,7 @@ export default class Ajouter_Automate extends Component {
         if(nom){
             var list = this.state.ing_list.filter((value,index)=>{
                 
-                if(value.nom.toLowerCase().search(nom.toLowerCase()) != -1){
+                if(value.nomIng.toLowerCase().search(nom.toLowerCase()) != -1){
                     return value
                     
                 }
@@ -169,8 +180,37 @@ export default class Ajouter_Automate extends Component {
 
 
     componentDidMount(){
-        this.setState({ing_list_to_show : [...this.state.ing_list] })
-        this.setState({labo_list_to_show : [...this.state.labo_list] })
+        const data1 = getData("clients",null,"get")
+        data1.then((res)=>{
+            if(res.status == "OK"){
+                this.setState({labo_list_to_show : res.doc,labo_list : res.doc })
+                if(res.doc.length != 0){
+                    this.setState({idLabo : res.doc[0].idLabo})
+                 }
+            }
+            else {
+                this.setState({labo_list_to_show : [] })
+
+            }
+        })
+        .catch(e=>console.log(e.message))
+
+        const data2 = getData("ingenieurs",null,"get")
+        data2.then((res)=>{
+            if(res.status == "OK"){
+                this.setState({ing_list_to_show : res.doc,ing_list : res.doc })
+                if(res.doc.length != 0){
+                   this.setState({idIng : res.doc[0].idIng})
+                }
+            }
+            else {
+                this.setState({ing_list_to_show : [] })
+
+            }
+        })
+        .catch(e=>console.log(e.message))
+        // this.setState({ing_list_to_show : [...this.state.ing_list] })
+        // this.setState({labo_list_to_show : [...this.state.labo_list] })
     }
 
   render() {
@@ -191,7 +231,7 @@ export default class Ajouter_Automate extends Component {
                 </div>
 
 
-                <Form className='form_box'  noValidate validated={this.state.validated} onSubmit={this.handleSubmit}>
+                <Form id='form' className='form_box'  noValidate validated={this.state.validated} onSubmit={this.handleSubmit}>
 
                     <Form.Group className='form_div' as={Row} controlId="validationCustomUsername">
 
@@ -202,7 +242,7 @@ export default class Ajouter_Automate extends Component {
                                 required
                                 aria-label="Default select example">
                                 {this.state.labo_list_to_show.map((value,index)=>{
-                                    return <option  className='option_text' key={index} value={value.id} > {value.nom} </option>
+                                    return <option  className='option_text' key={index} value={value.idLabo} onChange={()=> this.setState({idLabo : value.idLabo })}  > {value.nom_labo} </option>
                                 
                                 })}
                             </Form.Select>
@@ -221,9 +261,10 @@ export default class Ajouter_Automate extends Component {
                             <InputGroup.Text id="inputGroup-sizing-lg">Ingénieur </InputGroup.Text>
                             <Form.Select
                                 required
+                                onChange={(e)=> this.setState({idIng : e.target.value})}
                                 aria-label="Default select example">
                                 {this.state.ing_list_to_show.map((value, index) => {
-                                    return <option className='option_text' key={index} value={value.id} > {value.nom} </option>
+                                    return <option className='option_text' key={index} value={value.idIng}  > {value.nomIng} </option>
 
                                 })}
                             </Form.Select>
@@ -242,7 +283,7 @@ export default class Ajouter_Automate extends Component {
                         <InputGroup className='input_group' hasValidation>
                             <InputGroup.Text id="inputGroup-sizing-lg">Nom d'automate </InputGroup.Text>
                             <Form.Control
-                                onChange={(e)=>this.setState({adresse : e.target.value})}
+                                onChange={(e)=>this.setState({nom_automate : e.target.value})}
                                 className='input_text'
                                 type="text"
                                 placeholder="Nom d'automate"
@@ -257,7 +298,7 @@ export default class Ajouter_Automate extends Component {
                         <InputGroup className='input_group' hasValidation>
                             <InputGroup.Text id="inputGroup-sizing-lg">Marque d'automate </InputGroup.Text>
                             <Form.Control
-                                onChange={(e)=>this.setState({adresse : e.target.value})}
+                                onChange={(e)=>this.setState({marque_automate : e.target.value})}
                                 className='input_text'
                                 type="text"
                                 placeholder="Marque d'automate"

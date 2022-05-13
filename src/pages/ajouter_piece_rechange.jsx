@@ -5,6 +5,7 @@ import SideBar from './cards/sideBar'
 import {AiFillCloseCircle} from "react-icons/ai"
 import $ from 'jquery'
 import { withRouter } from '../js/withRouter'
+import postData from '../api/postData'
 
  class Ajouter_Piece_Rechange extends Component {
 
@@ -28,23 +29,22 @@ import { withRouter } from '../js/withRouter'
         }
         else { 
             event.preventDefault()
-            let headers = new Headers()
-            headers.append('Content-Type', 'application/json');
-            headers.append('Accept', 'application/json');
-            headers.append('Origin','http://localhost:3000');
-            headers.append('Authorization','bearer '+localStorage.getItem('access_token'))
 
-            fetch('http://localhost:3001/ajouter_client',{
-                mode :'cors',
-                method : 'POST',
-                headers : headers,
-                body : JSON.stringify({
-                    nom_labo : this.state.nom_labo,
-                    ville : this.state.ville,
-                    adresse : this.state.adresse,
-                })
+            // fetch('http://localhost:3001/ajouter_piece_rechange',{
+            //     mode :'cors',
+            //     method : 'POST',
+            //     headers : headers,
+            //     body : JSON.stringify({
+            //         nom_piece : this.state.nom_piece,
+            //         marque_piece : this.state.marque_piece,
+            //     })
+            // })
+            const dataPromise = postData("ajouter_piece_rechange",{
+                nom_piece : this.state.nom_piece,
+                marque_piece : this.state.marque_piece,
             })
-            .then((res)=>{
+
+            dataPromise.then((res)=>{
                 if(res.status === 400) {
                     $('#error_message').css("color","red")
                     $('#error_message').text("Les données envoyer ne sont pas complete!")
@@ -58,6 +58,7 @@ import { withRouter } from '../js/withRouter'
                         .fadeIn("slow")
                     })
                     .catch(e => console.log(e))
+                    $('#form').trigger('reset')
                 }
                 else {
                     $('#error_message').css("color","red")
@@ -94,7 +95,7 @@ import { withRouter } from '../js/withRouter'
                     </div>
                 
 
-                <Form className='form_box' noValidate validated={this.state.validated} onSubmit={this.handleSubmit}>
+                <Form id='form' className='form_box' noValidate validated={this.state.validated} onSubmit={this.handleSubmit}>
 
                     <Form.Group className='form_div' as={Row} controlId="validationCustomUsername">
 

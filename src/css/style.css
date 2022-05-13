@@ -239,6 +239,7 @@ section {
 /* 5 Navigation
 ----------------------------------------------------------------------------- */
 .l_navbar-custom {
+	height: 60px !important;
 	background: transparent !important;
 	border-radius: 0px !important;
 	margin-bottom: 0px;
@@ -262,7 +263,7 @@ section {
 	color: #333;
 }
 .l_navbar-custom .l_nav {
-	padding: 15px 0px !important;
+	padding: 10px 0px !important;
 }
 .nav_elem {
 	color: #e3e3e3 !important;
@@ -431,6 +432,11 @@ nav.small {
 
 /* about us
 ----------------------------------------------------------------------------- */
+
+.inputGroup-sizing-lg-index {
+	background-color: rgb(16, 19, 18) !important;
+}
+
 
 #about-us {
 	background-color: rgb(16, 19, 18);

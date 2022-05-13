@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import Helmet from 'react-helmet'
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import {Container,Navbar,Nav} from "react-bootstrap"
+import {Container,Navbar,Nav,Form,Button,InputGroup,Row} from "react-bootstrap"
 import Radium,{StyleRoot} from "radium"
 import { fadeIn,fadeOut,fadeInUp,fadeInRight } from 'react-animations'
 import VisibilitySensor from 'react-visibility-sensor';
@@ -16,13 +16,13 @@ import "../css/font-awesome.min.css"
 import "../css/component.css"
 import "../css/owl.carousel.css"
 import "../css/owl.theme.css"
-import "../css/style.css"
 import "../css/green.css"
 import playImage from '../images/play.png'
 import Person from '../images/person.jpeg'
 import Settings from '../images/setttings.png'
 import LoginModal from './cards/loginModal.jsx'
 import { withRouter } from '../js/withRouter.js';
+import postData from '../api/postData.js';
 
 const styles = {
     fadeInRight: {
@@ -41,14 +41,115 @@ const styles = {
 
  class Index extends Component {
 
-    
+    constructor(props) {
+        super(props)
+        try {
+            const isAuthenticated = JSON.parse(localStorage.getItem("isAuthenticated"))
+            // console.log("root isAutehnticated",isAuthenticated)
+            if(typeof isAuthenticated != 'undefined' && isAuthenticated){
+                // console.log("root isAutehnticated 2",isAuthenticated)
+                this.props.navigate("/automates")
+            }
+        } catch (error) {
+            console.log(error)
+        }
 
-    state = {
-        visibility: false,
-        showVideo : false,
-        modalShow : false
+
+
+        this.state = {
+            validated: false,
+            piece_list: [],
+            piece_list_to_show: [],
+            selected_pieces: [],
+            nom: '',
+            email: '',
+            phone: '',
+            message: '',
+            numPhoneValide: false,
+            visibility: false,
+            showVideo: false,
+            modalShow: false
+        }
+
+    }
+
+
+   validePhone = (e) =>{
+    var list = ["05","06","07"]
+    if(e.length === 10){
+        this.setState({numIng : e})
+        var ext = list.includes(e.substring(0,2))
+        console.log("ext",ext,e.substring(0,2))
+        var isNumber = parseInt(e)
+        if(ext && !isNaN(isNumber) ){
+            this.setState({numPhoneValide : true})
+            console.log("phone number verified")
+        }
+        else {
+            console.log("phone number not verified")
+            this.setState({numPhoneValide : false})
+
+        }   
+    }
+    else {
+        console.log("phone number not verified")
+        this.setState({numPhoneValide : false})
+
+    }
+}
+
+  handleSubmit = (event) => {
+    $('#error_message').text('')
+    const form = event.currentTarget;
+    if (form.checkValidity() === false || this.state.numPhoneValide === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      if(!this.state.numPhoneValide){
+          $('#error_message').text("Numéro de téléphone n'est pas valider, donner un numéro valide et la début soit 05,06,07")
+          .css("color","red")
       }
 
+    }
+    else {
+        event.preventDefault()
+        const dataPromise = postData("send_email",{
+            fullName : this.state.nom,
+            phone : this.state.phone,
+            message : this.state.message,
+            email : this.state.email,
+        })
+        
+        dataPromise.then((res)=>{
+            
+            if(res.status === 400) {
+                $('#error_message').css("color","red")
+                $('#error_message').text("Les données envoyer ne sont pas complete!")
+                .fadeIn("slow")
+                
+            }
+            else if ( res.status === 200 ){
+                $('#error_message').css("color","#021B40")
+                res.json().then((data)=>{
+                    $('#error_message').text(data.message)
+                    .fadeIn("slow")
+                })
+                .catch(e => console.log(e))
+                $("#form").trigger('reset')
+            }
+            else {
+                $('#error_message').css("color","red")
+                $('#error_message').text("Error survenu durant la traitement de requet")
+                    .fadeIn("slow")
+            }
+        })
+        .catch(e => {
+            console.log(e.message)
+        })
+    }
+    this.setState({validated : true})
+
+
+  }
 
 
       onHide(e){
@@ -320,39 +421,93 @@ const styles = {
                                 <h3 className="title text-center">Contact Us</h3>
                                 <div className="titleHR"><span></span></div>
 
-                                <form role="form" name="ajax-form" id="ajax-form"   className="form-main">
-                                    <div className="col-xs-12">
-                                        <div className="row">
-                                            <div className="form-group col-xs-6">
-                                                <label htmlFor="name2">Name</label>
-                                                <input className="form-control" id="name2" name="name"  type="text" placeholder="Name" />
-                                                    <div className="error" id="err-name" >Please enter name</div>
-                                            </div>
-                                            <div className="form-group col-xs-6">
-                                                <label htmlFor="email2">Email</label>
-                                                <input className="form-control" id="email2" name="email" type="text"  placeholder="E-mail" />
-                                                    <div className="error" id="err-emailvld" >E-mail is not a valid format</div>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="form-group col-xs-12">
-                                                <label htmlFor="message2">Message</label>
-                                                <textarea className="form-control" id="message2" name="message" placeholder="Message" ></textarea>
-                                                <div className="error" id="err-message" >Please enter message</div>
-                                            </div>
-                                        </div>
-                                       
-                                        <div className="row">
-                                            <div className="col-xs-12 text-center">
-                                                <div id="ajaxsuccess">E-mail was successfully sent.</div>
-                                                <div className="error" id="err-form" >There was a problem validating the form please check!</div>
-                                                <div className="error" id="err-timedout">The connection to the server timed out!</div>
-                                                <div className="error" id="err-state"></div>
-                                                <button type="submit" className="btn btn-custom" id="send">Submit</button>
-                                            </div>
-                                        </div>
+                                <Form id='form' noValidate validated={this.state.validated} onSubmit={this.handleSubmit}>
+                                    <div className='error_div' >
+                                        <p id='error_message' > </p>
                                     </div>
-                                </form>
+                                    <Form.Group className='form_div' as={Row} controlId="validationCustomUsername">
+                                        <InputGroup className='input_group ' hasValidation>
+                                            <InputGroup.Text id="inputGroup-sizing-lg" className='inputGroup-sizing-lg-index' >Nom </InputGroup.Text>
+                                            <Form.Control
+                                                onChange={(e) => this.setState({ nom: e.target.value })}
+                                                className='input_text'
+                                                type="text"
+                                                placeholder='Nom'
+                                                aria-describedby="inputGroupPrepend"
+                                                required
+                                            />
+                                            <Form.Control.Feedback className='feed_back' type="invalid">
+                                                S'il vous plait entrer votre nom.
+                                            </Form.Control.Feedback>
+                                        </InputGroup>
+                                        <br />
+                                        <InputGroup className='input_group' hasValidation>
+                                            <InputGroup.Text id="inputGroup-sizing-lg" className='inputGroup-sizing-lg-index' >E-mail </InputGroup.Text>
+                                            <Form.Control
+                                                onChange={(e) => this.setState({ email: e.target.value })}
+                                                className='input_text'
+                                                type="email"
+                                                placeholder='E-mail'
+                                                aria-describedby="inputGroupPrepend"
+                                                required
+                                            />
+                                            <Form.Control.Feedback className='feed_back' type="invalid">
+                                                S'il vous plait entrer E-mail.
+                                            </Form.Control.Feedback>
+                                        </InputGroup>
+                                        <br />
+                                        <InputGroup className='input_group ' hasValidation>
+                                            <InputGroup.Text id="inputGroup-sizing-lg" className='inputGroup-sizing-lg-index' >Numéro téléphone </InputGroup.Text>
+                                            <Form.Control
+                                                onChange={(e) => {
+                                                    this.setState({ phone: e.target.value })
+                                                    this.validePhone(e.target.value)
+                                                }}
+                                                className='input_text'
+                                                type="text"
+                                                placeholder="Numéro téléphone"
+                                                aria-describedby="inputGroupPrepend"
+                                                maxLength={10}
+                                                minLength={10}
+                                                required
+                                            />
+                                            <Form.Control.Feedback className='feed_back' type="invalid">
+                                                S'il vous plait entrée Numéro téléphone.
+                                            </Form.Control.Feedback>
+                                        </InputGroup>
+                                        <br />
+                                        <InputGroup className='input_group' hasValidation>
+                                            <InputGroup.Text id="inputGroup-sizing-lg" className='inputGroup-sizing-lg-index' >Message </InputGroup.Text>
+                                            <Form.Control
+                                                onChange={(e) => this.setState({ message: e.target.value })}
+                                                className='input_text form_textarea  '
+                                                as="textarea"
+                                                rows={3}
+                                                placeholder="Message"
+                                                aria-describedby="inputGroupPrepend"
+                                                required
+                                            />
+                                            <Form.Control.Feedback className='feed_back' type="invalid">
+                                                S'il vous plait donner Message.
+                                            </Form.Control.Feedback>
+                                        </InputGroup>
+                                        <br />
+                                        <Button id='submit' type='submit' style={{
+                                            backgroundColor : 'rgb(16, 19, 18)',
+                                            borderColor :'rgb(16, 19, 18)'
+                                        }}
+                                            onMouseEnter={(e)=> {
+                                                e.currentTarget.style.backgroundColor = "white";
+                                                e.currentTarget.style.color = "black"
+                                            }}
+                                            onMouseLeave={(e)=>{
+                                                e.currentTarget.style.backgroundColor = 'rgb(16, 19, 18)';
+                                                e.currentTarget.style.color = "white"
+                                            }}
+                                         >Envoyer</Button>
+
+                                    </Form.Group>
+                                </Form>
                             </div>
                         </div>
                     </div>

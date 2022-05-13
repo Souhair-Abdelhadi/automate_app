@@ -5,6 +5,7 @@ import SideBar from './cards/sideBar'
 import {AiFillCloseCircle} from "react-icons/ai"
 import $ from 'jquery'
 import { withRouter } from '../js/withRouter'
+import getData from "../api/getData"
 
  class Piece_Rechange extends Component {
 
@@ -16,19 +17,7 @@ import { withRouter } from '../js/withRouter'
             src : null,
             list_to_show : []
         }
-        for(var i=1; i<= 15; i++){
-            var obj = {
-                id : i,
-                nom_piece : "piece "+i,
-                marque_piece : "marque "+i,
-
-            }
-            this.state.piece_rechange_liste.push(obj)
-            this.setState({list_to_show : [...this.state.piece_rechange_liste]})
-            if( i == 15){
-                this.setState({liste_loaded : true})
-            }
-        }
+        
     }
 
     
@@ -39,8 +28,14 @@ import { withRouter } from '../js/withRouter'
     }
 
     componentDidMount(){
-        console.log(this.state.piece_rechange_liste)
-        this.setState({list_to_show : [...this.state.piece_rechange_liste]})
+        const data = getData("pieces_rechanges",null,"get")
+        data.then((res)=>{
+            if(res.status == 'OK'){
+                this.setState({list_to_show : res.doc,piece_rechange_liste : res.doc})
+            }
+
+        })
+        .catch(e=>console.log(e.message))
     }
 
   render() {
@@ -98,9 +93,9 @@ import { withRouter } from '../js/withRouter'
                             {this.state.list_to_show.map((value,index)=>{
                                 return (
                                     <tr key={index} >
-                                        <td>{value.id}</td>
-                                        <td>{value.nom_piece}</td>
-                                        <td>{value.marque_piece}</td>
+                                        <td>{value.idPiece}</td>
+                                        <td>{value.nomPiece}</td>
+                                        <td>{value.marquePiece}</td>
                                         <td>
 
                                         </td>

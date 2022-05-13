@@ -1,25 +1,25 @@
 import React, { Component } from 'react'
-import {Form,Button,InputGroup,Row} from "react-bootstrap"
-import $ from "jquery"
 import "../css/notFound.css"
- class Test1 extends Component {
+import { withRouter } from '../js/withRouter'
 
-   constructor(props) {
-     super(props)
-     this.state = {
-       
-     }
+ class PageNotFound extends Component {
 
-   }
-
+   
    componentDidMount(){
-    
+
+    document.body.style.backgroundColor = "#181828"
         
    }
+   
+   componentWillUnmount(){
+    document.body.style.backgroundColor = "white"
+   }
+
+   
 
   render() {
     return (
-      <div  >
+      <div className='pagenotfound__body'  >
 
         <header className="top-header">
         </header>
@@ -48,8 +48,8 @@ import "../css/notFound.css"
               <h1 className='message__title'>Page Not Found</h1>
               <p className="message__text">Nous sommes désolés, la page que vous recherchez ne se trouve pas ici.</p>
             </div>
-            <div style={{cursor : 'pointer'}}  className="error__nav e-nav">
-              <a onClick={()=>this.props.navigate("/")} target="_blanck" className="e-nav__link"></a>
+            <div style={{cursor : 'pointer'}} onClick={()=>this.props.navigate("/")} className="error__nav e-nav">
+              <a  target="_blanck" className="e-nav__link"></a>
             </div>
           </div>
 
@@ -60,4 +60,4 @@ import "../css/notFound.css"
   }
 }
 
-export default Test1
+export default withRouter(PageNotFound)

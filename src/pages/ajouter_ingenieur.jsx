@@ -7,16 +7,18 @@ import $ from 'jquery'
 import { withRouter } from '../js/withRouter'
 import postData from '../api/postData'
 
- class Ajouter_Client extends Component {
+ class Ajouter_Ingenieur extends Component {
 
     constructor(props){
         super(props)
         this.state = {
             validated : false,
-            nom_labo : '',
-            ville : '',
-            adresse : '',
-            numPhone : '',
+            nomIng : '',
+            numIng : '',
+            email : '',
+            password : '',
+            specialite : '',
+            admin : 0,
             numPhoneValide : false,
         }
         
@@ -36,32 +38,21 @@ import postData from '../api/postData'
         }
         else { 
             event.preventDefault()
-            let headers = new Headers()
-            headers.append('Content-Type', 'application/json');
-            headers.append('Accept', 'application/json');
-            headers.append('Origin','http://localhost:3000');
-            headers.append('Authorization','bearer '+localStorage.getItem('access_token'))
-            const dataPromise = postData("ajouter_client",{
-                nom_labo : this.state.nom_labo,
-                ville : this.state.ville,
-                adresse : this.state.adresse,
-                numPhone : this.state.numPhone,
+            
+            const dataPromise = postData("ajouter_ingenieur",{
+                nomIng : this.state.nomIng,
+                numIng : this.state.numIng,
+                email : this.state.email,
+                password : this.state.password,
+                specialite : this.state.specialite,
+                admin : this.state.admin,
+                
             })
-            // fetch('http://localhost:3001/ajouter_client',{
-            //     mode :'cors',
-            //     method : 'POST',
-            //     headers : headers,
-            //     body : JSON.stringify({
-            //         nom_labo : this.state.nom_labo,
-            //         ville : this.state.ville,
-            //         adresse : this.state.adresse,
-            //         numPhone : this.state.numPhone,
-            //     })
-            // })
+            
             dataPromise.then((res)=>{
                 if(res.status === 400) {
                     $('#error_message').css("color","red")
-                    $('#error_message').text("Les données envoyer ne sont pas complete!")
+                    $('#error_message').text("Les données envoyer ne sont pas complete/valider!")
                     .fadeIn("slow")
                 }
                 else if ( res.status === 200 ){
@@ -83,6 +74,7 @@ import postData from '../api/postData'
             .catch(e => {
                 console.log(e.message)
             })
+
         }
         this.setState({validated : true})
 
@@ -91,6 +83,7 @@ import postData from '../api/postData'
     validePhone = (e) =>{
         var list = ["05","06","07"]
         if(e.length === 10){
+            this.setState({numIng : e})
             var ext = list.includes(e.substring(0,2))
             console.log("ext",ext,e.substring(0,2))
             var isNumber = parseInt(e)
@@ -111,6 +104,14 @@ import postData from '../api/postData'
         }
     }
     
+    generatePassword = () => {
+        var randomstring = Math.random().toString(36).slice(-11);
+        this.setState({password : randomstring})
+        
+        
+    }
+
+
     componentDidMount(){
 
     }
@@ -121,7 +122,7 @@ import postData from '../api/postData'
             <SideBar>
                 
                 <div className='interface_header' >
-                    <h1 id='header_text' >Ajouter un client</h1>
+                    <h1 id='header_text' >Ajouter un Ingenieur</h1>
 
                 </div>
 
@@ -135,12 +136,12 @@ import postData from '../api/postData'
                     <Form.Group className='form_div' as={Row} controlId="validationCustomUsername">
 
                         <InputGroup className='input_group' hasValidation>
-                            <InputGroup.Text id="inputGroup-sizing-lg">Nom de labo</InputGroup.Text>
+                            <InputGroup.Text id="inputGroup-sizing-lg">Nom d'ingenieur</InputGroup.Text>
                             <Form.Control
-                                onChange={(e)=>this.setState({nom_labo : e.target.value})}
+                                onChange={(e)=>this.setState({nomIng : e.target.value})}
                                 className='input_text'
                                 type="text"
-                                placeholder="Nom de labo"
+                                placeholder="Nom d'ingenieur"
                                 aria-describedby="inputGroupPrepend"
                                 required
                             />
@@ -150,56 +151,85 @@ import postData from '../api/postData'
                         </InputGroup>
                         <br />
                         <InputGroup className='input_group' hasValidation>
-                            <InputGroup.Text id="inputGroup-sizing-lg">Ville</InputGroup.Text>
+                            <InputGroup.Text id="inputGroup-sizing-lg">Num téléphone</InputGroup.Text>
                             <Form.Control
-                                onChange={(e)=>this.setState({ville : e.target.value})}
+                                onChange={(e)=>this.validePhone(e.target.value)}
                                 className='input_text'
                                 type="text"
-                                placeholder="Ville"
+                                placeholder="Num téléphone"
                                 aria-describedby="inputGroupPrepend"
-                                required
-                            />
-                            <Form.Control.Feedback className='feed_back' type="invalid">
-                                S'il vous plait entrée une ville.
-                            </Form.Control.Feedback>
-                        </InputGroup>
-                        <br />
-                        <InputGroup className='input_group' hasValidation>
-                            <InputGroup.Text id="inputGroup-sizing-lg">Num telephone</InputGroup.Text>
-                            <Form.Control
-                                onChange={(e)=>{
-                                    this.setState({numPhone : e.target.value})
-                                    this.validePhone( e.target.value)
-                                }}
-                                className='input_text'
-                                type="text"
-                                placeholder="Num telephone"
-                                aria-describedby="inputGroupPrepend"
-                                minLength={10}
                                 maxLength={10}
+                                minLength={10}
+                                
                                 required
                             />
                             <Form.Control.Feedback className='feed_back' type="invalid">
-                                S'il vous plait entrée une num telephone valide.
+                                S'il vous plait entrée num téléphone.
                             </Form.Control.Feedback>
                         </InputGroup>
                         <br />
                         <InputGroup className='input_group' hasValidation>
-                            <InputGroup.Text id="inputGroup-sizing-lg">Adresse</InputGroup.Text>
+                            <InputGroup.Text id="inputGroup-sizing-lg">E-mail</InputGroup.Text>
                             <Form.Control
-                                onChange={(e)=>this.setState({adresse : e.target.value})}
+                                onChange={(e)=>this.setState({email : e.target.value})}
                                 className='input_text'
-                                type="text"
-                                placeholder="Adresse"
+                                type="email"
+                                placeholder="E-mail"
                                 aria-describedby="inputGroupPrepend"
                                 required
                             />
                             <Form.Control.Feedback className='feed_back' type="invalid">
-                                S'il vous plait entrée une adresse.
+                                S'il vous plait entrée un email.
                             </Form.Control.Feedback>
                         </InputGroup>
                         <br />
-
+                        <InputGroup className='input_group mb-3'  hasValidation>
+                            <InputGroup.Text id="inputGroup-sizing-lg">Mot de passe</InputGroup.Text>
+                            <Form.Control
+                                onChange={(e)=>this.setState({password : e.target.value})}
+                                className='input_text'
+                                type="text"
+                                placeholder="Mot de passe"
+                                minLength={8}
+                                maxLength={16}
+                                value={this.state.password}
+                                aria-describedby="inputGroupPrepend"
+                                required
+                            />
+                            <Button variant='info' onClick={()=> this.generatePassword()}  > Generer </Button>
+                            <Form.Control.Feedback className='feed_back' type="invalid">
+                                S'il vous plait entrée le mot de passe.
+                            </Form.Control.Feedback>
+                        </InputGroup>
+                        <br />
+                        <InputGroup className='input_group' hasValidation>
+                            <InputGroup.Text id="inputGroup-sizing-lg">Spécialité</InputGroup.Text>
+                            <Form.Control
+                                onChange={(e)=>this.setState({specialite : e.target.value})}
+                                className='input_text'
+                                type="text"
+                                placeholder="Spécialité"
+                                aria-describedby="inputGroupPrepend"
+                                required
+                            />
+                            <Form.Control.Feedback className='feed_back' type="invalid">
+                                S'il vous plait entrée la spécialité.
+                            </Form.Control.Feedback>
+                        </InputGroup>
+                        <br />
+                        <InputGroup className='input_group' hasValidation>
+                            <InputGroup.Text id="inputGroup-sizing-lg">Responsable</InputGroup.Text>
+                            <Form.Select
+                                onChange={(e) => this.setState({admin : e.target.value})}
+                                aria-label="Default select example">
+                                <option className='option_text' value={0} > Non </option>
+                                <option className='option_text' value={1} > Oui </option>
+                            </Form.Select>
+                            <Form.Control.Feedback className='feed_back' type="invalid">
+                                S'il vous plait entrée donner responsabilié.
+                            </Form.Control.Feedback>
+                        </InputGroup>
+                        <br />
                         <Button id='submit' type='submit' variant="primary">Ajouter</Button>
 
                     </Form.Group>
@@ -213,4 +243,4 @@ import postData from '../api/postData'
   }
 }
 
-export default withRouter(Ajouter_Client)
+export default withRouter(Ajouter_Ingenieur)

@@ -5,6 +5,7 @@ import SideBar from './cards/sideBar'
 import {AiFillCloseCircle} from "react-icons/ai"
 import $ from 'jquery'
 import { withRouter } from '../js/withRouter'
+import getData from '../api/getData'
 
  class Interventions extends Component {
 
@@ -14,26 +15,10 @@ import { withRouter } from '../js/withRouter'
         this.state = {
             interventions_liste : [],
             liste_loaded : false,
-            list_to_show : []
+            list_to_show : [],
+            description : ''
         }
-        for(var i=1; i<= 15; i++){
-            var obj = {
-                id : i,
-                id_automate : i,
-                nom_automate : "nom "+i,
-                id_ing	: i,
-                nom_ing : "ing "+ i,
-                date_inter : "date "+i,
-                duree_inter : i+" jour(s)",
-                description : "description " +i,
-
-            }
-            this.state.interventions_liste.push(obj)
-            this.setState({list_to_show : [...this.state.interventions_liste]})
-            if( i == 15){
-                this.setState({liste_loaded : true})
-            }
-        }
+        
     }
 
     redirect(path){
@@ -45,9 +30,43 @@ import { withRouter } from '../js/withRouter'
         $('#image_div').toggle('slow')
     }
 
+    
+     
+    formatDate = (date) => {
+        try {
+            var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+    
+            if (month.length < 2) 
+                month = '0' + month;
+            if (day.length < 2) 
+                day = '0' + day;
+        return [day, month, year].join('/');
+        } catch (error) {
+            console.log(error)
+            return "undefined"
+        }
+      }
+
+
+      closeDescription = (e) => {
+          this.setState({description : e})
+          $('#image_div').toggle()
+      }
+
     componentDidMount(){
-        console.log(this.state.interventions_liste)
-        this.setState({list_to_show : [...this.state.interventions_liste]})
+        const data = getData("interventions?email="+JSON.parse(localStorage.getItem("user")).email,null,"get")
+        data.then((res)=>{
+            if(res.status == "OK"){
+                this.setState({list_to_show : res.doc,interventions_liste : res.doc})
+            }
+            else {
+                console.log(res.message)
+            }
+        })
+        .catch(e=>console.log(e.message))
     }
 
   render() {
@@ -55,6 +74,16 @@ import { withRouter } from '../js/withRouter'
       <div>
             <SideBar>
                 
+                <div className='image_div' id='image_div'  >
+                <AiFillCloseCircle  className='close_icon' onClick={()=> this.closeDescription('')} />
+                    <div className="description_modal">
+                        <h4> Description de l'intervention </h4>
+                        <div className='description_text' >
+                            <p> {this.state.description} </p>
+                        </div>
+                    </div>
+                </div>
+
                 <div className='interface_header' >
                     <h1 id='header_text' >Liste des interventions</h1>
 
@@ -73,7 +102,7 @@ import { withRouter } from '../js/withRouter'
                                 onChange={(inputValue)=>{
                                     if(inputValue.target.value.length != 0){
                                         var list = this.state.interventions_liste.filter((value)=>{
-                                            if(value.nom_automate.toLowerCase().search(inputValue.target.value.toLowerCase()) !=-1){
+                                            if(value.nomAutomate.toLowerCase().search(inputValue.target.value.toLowerCase()) !=-1){
                                                 return value 
                                             }
                                             
@@ -95,7 +124,6 @@ import { withRouter } from '../js/withRouter'
                                 <th>id </th>
                                 <th>id automate</th>
                                 <th>Nom automate</th>
-                                <th>id ing</th>
                                 <th>Nom ing</th>
                                 <th>Date intervention</th>
                                 <th>Duree intervention</th>
@@ -107,14 +135,13 @@ import { withRouter } from '../js/withRouter'
                             {this.state.list_to_show.map((value,index)=>{
                                 return (
                                     <tr key={index} >
-                                        <td>{value.id}</td>
+                                        <td>{value.idInter}</td>
                                         <td>{value.id_automate}</td>
-                                        <td>{value.nom_automate}</td>
-                                        <td>{value.id_ing}</td>
-                                        <td>{value.nom_ing}</td>
-                                        <th>{value.date_inter}</th>
+                                        <td>{value.nomAutomate}</td>
+                                        <td>{value.nomIng}</td>
+                                        <th>{ this.formatDate(value.date_inter) }</th>
                                         <th>{value.duree_inter}</th>
-                                        <th>{value.description}</th>
+                                        <th><Button variant='info' onClick={()=> this.closeDescription(value.description) }   >Voir</Button></th>
 
                                         <td>
 
