@@ -1,25 +1,32 @@
 
 import React, { Component } from 'react'
-import Helmet from 'react-helmet'
+// import Helmet from 'react-helmet'
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import {BsTelephoneFill,BsLinkedin} from "react-icons/bs"
+import {FaFax} from "react-icons/fa"
+import {GrMail} from "react-icons/gr"
+import {GiPositionMarker} from "react-icons/gi"
 import {Container,Navbar,Nav,Form,Button,InputGroup,Row} from "react-bootstrap"
 import Radium,{StyleRoot} from "radium"
 import { fadeIn,fadeOut,fadeInUp,fadeInRight } from 'react-animations'
 import VisibilitySensor from 'react-visibility-sensor';
 import $ from 'jquery'
 import Map from './cards/map.js'
+import '../css/bootstrap.min.css'
 import YoutubeEmbeded from './cards/youtube.js'
-import "../css/bootstrap.min.css"
 import "../css/style.css"
-import "../css/font-awesome.min.css"
 import "../css/component.css"
-import "../css/owl.carousel.css"
-import "../css/owl.theme.css"
 import "../css/green.css"
 import playImage from '../images/play.png'
 import Person from '../images/person.jpeg'
-import Settings from '../images/setttings.png'
+import A1 from '../images/1.png'
+import A2 from '../images/2.png'
+import A3 from '../images/3.png'
+import A4 from '../images/4.png'
+import A5 from '../images/5.png'
+import Logo from '../images/logo.jpg'
+import Analyse_bio from '../images/analyse_biomedicale.jpg'
 import LoginModal from './cards/loginModal.jsx'
 import { withRouter } from '../js/withRouter.js';
 import postData from '../api/postData.js';
@@ -54,7 +61,10 @@ const styles = {
             console.log(error)
         }
 
-
+        this.aboutUsRef = React.createRef()
+        this.homeRef = React.createRef()
+        this.contactRef = React.createRef()
+        this.servicesRef = React.createRef()
 
         this.state = {
             validated: false,
@@ -68,218 +78,225 @@ const styles = {
             numPhoneValide: false,
             visibility: false,
             showVideo: false,
-            modalShow: false
+            modalShow: false,
+            servicesVisible : false,
         }
 
     }
 
 
    validePhone = (e) =>{
-    var list = ["05","06","07"]
-    if(e.length === 10){
-        this.setState({numIng : e})
-        var ext = list.includes(e.substring(0,2))
-        console.log("ext",ext,e.substring(0,2))
-        var isNumber = parseInt(e)
-        if(ext && !isNaN(isNumber) ){
-            this.setState({numPhoneValide : true})
-            console.log("phone number verified")
+        var list = ["05","06","07"]
+        if(e.length === 10){
+            this.setState({numIng : e})
+            var ext = list.includes(e.substring(0,2))
+            console.log("ext",ext,e.substring(0,2))
+            var isNumber = parseInt(e)
+            if(ext && !isNaN(isNumber) ){
+                this.setState({numPhoneValide : true})
+                console.log("phone number verified")
+            }
+            else {
+                console.log("phone number not verified")
+                this.setState({numPhoneValide : false})
+
+            }   
         }
         else {
             console.log("phone number not verified")
             this.setState({numPhoneValide : false})
 
-        }   
+        }
     }
-    else {
-        console.log("phone number not verified")
-        this.setState({numPhoneValide : false})
 
-    }
-}
+    handleSubmit = (event) => {
+        $('#error_message').text('')
+        const form = event.currentTarget;
+        if (form.checkValidity() === false || this.state.numPhoneValide === false) {
+        event.preventDefault();
+        event.stopPropagation();
+        if(!this.state.numPhoneValide){
+            $('#error_message').text("Numéro de téléphone n'est pas valider, donner un numéro valide et la début soit 05,06,07")
+            .css("color","red")
+        }
 
-  handleSubmit = (event) => {
-    $('#error_message').text('')
-    const form = event.currentTarget;
-    if (form.checkValidity() === false || this.state.numPhoneValide === false) {
-      event.preventDefault();
-      event.stopPropagation();
-      if(!this.state.numPhoneValide){
-          $('#error_message').text("Numéro de téléphone n'est pas valider, donner un numéro valide et la début soit 05,06,07")
-          .css("color","red")
-      }
-
-    }
-    else {
-        event.preventDefault()
-        const dataPromise = postData("send_email",{
-            fullName : this.state.nom,
-            phone : this.state.phone,
-            message : this.state.message,
-            email : this.state.email,
-        })
-        
-        dataPromise.then((res)=>{
+        }
+        else {
+            event.preventDefault()
+            const dataPromise = postData("send_email",{
+                fullName : this.state.nom,
+                phone : this.state.phone,
+                message : this.state.message,
+                email : this.state.email,
+            })
             
-            if(res.status === 400) {
-                $('#error_message').css("color","red")
-                $('#error_message').text("Les données envoyer ne sont pas complete!")
-                .fadeIn("slow")
+            dataPromise.then((res)=>{
                 
-            }
-            else if ( res.status === 200 ){
-                $('#error_message').css("color","#021B40")
-                res.json().then((data)=>{
-                    $('#error_message').text(data.message)
+                if(res.status === 400) {
+                    $('#error_message').css("color","red")
+                    $('#error_message').text("Les données envoyer ne sont pas complete!")
                     .fadeIn("slow")
-                })
-                .catch(e => console.log(e))
-                $("#form").trigger('reset')
-            }
-            else {
-                $('#error_message').css("color","red")
-                $('#error_message').text("Error survenu durant la traitement de requet")
-                    .fadeIn("slow")
-            }
-        })
-        .catch(e => {
-            console.log(e.message)
-        })
+                    
+                }
+                else if ( res.status === 200 ){
+                    $('#error_message').css("color","#021B40")
+                    res.json().then((data)=>{
+                        $('#error_message').text(data.message)
+                        .fadeIn("slow")
+                    })
+                    .catch(e => console.log(e))
+                    $("#form").trigger('reset')
+                }
+                else {
+                    $('#error_message').css("color","red")
+                    $('#error_message').text("Error survenu durant la traitement de requet")
+                        .fadeIn("slow")
+                }
+            })
+            .catch(e => {
+                console.log(e.message)
+            })
+        }
+        this.setState({validated : true})
+
+
     }
-    this.setState({validated : true})
 
 
-  }
-
-
-      onHide(e){
+    onHide(e){
         e.setState({
             modalShow : false
         })
     }
-      fadeServices = () =>{
-        const elem = document.getElementById("services");
-        const rect = elem.getBoundingClientRect();
-        var navTop = $('nav').offset().top
-        $('.nav').find("a").hover(function(){
-            $(this).mouseenter(function(){
-                $(this).css("color" , "#77dfa2" )
-            })
-            $(this).mouseleave(function(){
-                if(navTop < 100){
-                    $(this).css("color" , "white" )
-                }
-                else {
-                    $(this).css("color" , "black" )
-                }
-            })
+    
+    fadeServices = () =>{
+    const elem = document.getElementById("services");
+    const rect = elem.getBoundingClientRect();
+    var navTop = $('nav').offset().top
+    $('.nav').find("a").hover(function(){
+        $(this).mouseenter(function(){
+            $(this).css("color" , "#77dfa2" )
         })
-        if (navTop > 100) {
-            $('nav').css("backgroundColor","white")
-            $('nav').css("boxShadow","0 2px 4px 0 rgba(0,0,0,.2)")
-            $('#logo').css("color","black")
-            $('.nav').find("a").css("color","black")
-        }
-        else if (navTop < 100) {
-            $('nav').css("backgroundColor","transparent")
-            $('#logo').css("color","white")
-            $('.nav').find("a").css("color","white")
-            $('nav').css("boxShadow","0 2px 4px 0 transparent")
-        }
-        if(rect.y <= 496 && !this.state.visibility){
-            this.setState({ visibility : !this.state.visibility})
-            console.log("message shown")
-            // document.getElementById('services').style = styles.fadeUpGrids
-        }
+        $(this).mouseleave(function(){
+            if(navTop < 100){
+                $(this).css("color" , "white" )
+            }
+            else {
+                $(this).css("color" , "black" )
+            }
+        })
+    })
+    if (navTop > 100) {
+        $('nav').css("backgroundColor","white")
+        $('nav').css("boxShadow","0 2px 4px 0 rgba(0,0,0,.2)")
+        $('#logo').css("color","black")
+        $('.nav').find("a").css("color","black")
+    }
+    else if (navTop < 100) {
+        $('nav').css("backgroundColor","transparent")
+        $('#logo').css("color","white")
+        $('.nav').find("a").css("color","white")
+        $('nav').css("boxShadow","0 2px 4px 0 transparent")
+    }
+    if(rect.y <= 496 && !this.state.visibility){
+        this.setState({ visibility : !this.state.visibility})
+        console.log("message shown")
+        // document.getElementById('services').style = styles.fadeUpGrids
+    }
 
+    
         
-          
-      }
+    }
 
-      componentDidMount(){
-        
-        document.addEventListener('scroll',this.fadeServices)
-      }
+    onScroll = (ref) => {
+        ref.current.scrollIntoView({behavior : 'smooth' })
+    
+    }
+    
+    componentDidMount() {
+        // document.addEventListener('scroll',this.fadeServices)
 
-      componentWillUnmount(){
-          document.removeEventListener('scroll',this.fadeServices)
-      }
+        this.observe = new IntersectionObserver(([entry]) => {
+
+            if (entry.isIntersecting) {
+                this.setState({ servicesVisible: true })
+            }
+
+        })
+
+        this.observe.observe(this.servicesRef.current)
+
+    }
+
+    componentWillUnmount(){
+
+        this.observe.disconnect()
+    }
 
   render() {
     return (
-        <StyleRoot>
-        <div>
+        <StyleRoot >
+        <div  >
 
-            <div className="application">
+            {/* <div className="application">
                 <Helmet>
                     <meta  charSet='UTF-8' />
                     <meta name="viewport" content="initial-scale=1, width=device-width" />
                     <title>M-AUTOMATE</title>
                     <link href='http://fonts.googleapis.com/css?family=Signika+Negative:300,400,600,700' rel='stylesheet' type='text/css' />
                     <link href='http://fonts.googleapis.com/css?family=Kameron:400,700' rel='stylesheet' type='text/css' />
-                    {/* <script src="../js/jquery.min.js" type='javascript' ></script>
-                    <script src="../js/jquery.nav.js" type='javascript' ></script> */}
                 </Helmet>
                 
-            </div>
+            </div> */}
             
 
-            <Navbar bg="dark"  variant="dark" sticky='top' className='l_navbar-custom'  >
+            <Navbar  sticky='top' className='l_navbar-custom'  >
                     <Container>
-                        <Navbar.Brand href="#home"  id='index_logo' >M-AUTOMATE</Navbar.Brand>
+                        <Navbar.Brand onClick={()=> { this.onScroll(this.homeRef)}}  id='index_logo' >Diagnostic Systems</Navbar.Brand>
                         <Navbar.Collapse className="me-auto justify-content-end">
-                            <Nav.Link href="#home" className='nav_elem' >HOME</Nav.Link>
-                            <Nav.Link href="#services" className='nav_elem' >SERVICES</Nav.Link>
-                            <Nav.Link href="#about-us" className='nav_elem' >ABOUT US</Nav.Link>
-                            <Nav.Link href="#contact" className='nav_elem' >CONTACT</Nav.Link>
-                            <Nav.Link  className='nav_elem'  onClick={()=>this.setState({modalShow : true})} >Login</Nav.Link>
+                            <Nav.Link onClick={()=> { this.onScroll(this.homeRef)}} className='nav_elem' >HOME</Nav.Link>
+                            <Nav.Link onClick={()=> { this.onScroll(this.servicesRef)}} className='nav_elem' >SERVICES</Nav.Link>
+                            <Nav.Link onClick={()=> { this.onScroll(this.aboutUsRef)}} className='nav_elem' >ABOUT US</Nav.Link>
+                            <Nav.Link onClick={()=> { this.onScroll(this.contactRef)}}  className='nav_elem' >CONTACT</Nav.Link>
+                            <Nav.Link className='nav_elem'  onClick={()=>this.setState({modalShow : true})} >Login</Nav.Link>
                         </Navbar.Collapse>
                     </Container>
                 </Navbar>
 
                 <LoginModal modalShow={this.state.modalShow} onHide={this.onHide} this={this}  />
 
-            <section className="main-home" id="home">
+            <section className="main-home" id="home" ref={this.homeRef} >
                 <div className="home-page-photo"></div> 
                 <div style={styles.fadeInAppDescription}  >
 
                     <Box sx={{ flexGrow: 1,marginTop : -20 }}>
-                    <Grid container spacing={2}>
-                            <Grid item xs={5}  >
-                                <div className='left-grid-bg' >
-                                    <div>
-                                        <p id='left-grid-bg-Text-1' >Groupe M-AUTOMATE</p>
-                                    </div>
-                                    <div>
-                                        <p id='left-grid-bg-Text-2' >là pour vous servir au mieux</p>
-                                    </div>
-                                    <div id='left-grid-bg-round-div' >
-                                        <img src={playImage} id='playImage' alt="watch" />
-                                        <div onClick={()=>{this.setState({showVideo : true})}} >
-                                            <p id='left-grid-bg-round-div-text' >Watch</p>
+                        <Grid container spacing={2}>
+                                <Grid item xs={5}  >
+                                    <div className='left-grid-bg' >
+                                        <div>
+                                            <p id='left-grid-bg-Text-1' >Diagnostic Systems</p>
                                         </div>
+                                        <div>
+                                            <p id='left-grid-bg-Text-2' >Importation et distribution de Matériels et Réactifs de laboratoires</p>
+                                        </div>
+                                        
                                     </div>
-                                </div>
 
-                            </Grid>
-
-                        <Grid item xs={6}>
-                            <div className='youtube-embed' style={!this.state.showVideo ? {display : "none"} : [styles.fadeInAppDescription ,{display : "block"} ] }   >
-                                <YoutubeEmbeded embedId='KkFt7OGMjCM' width='400' height='400' />
-                            </div>
+                                </Grid>
                         </Grid>
-
-                    </Grid>
                     </Box>
                     </div>
             </section>
 
 
-            <section id="services"  style={!this.state.visibility ? {backgroundColor : '#77dfa2'} : [{backgroundColor : 'white',transition :  'ease-in',transitionDuration : '600ms'}]  } >
-                <div className="container" id='services-div'  style={!this.state.visibility ? {opacity : 0} : [styles.fadeUpGrids,{opacity : 1,transition :  'ease-in',transitionDuration : '600ms'}]  } >
+            <section id="services"
+            style={ this.state.servicesVisible ? [styles.fadeUpGrids, {display : 'block'}] : {display : 'none'}}
+
+             ref={this.servicesRef} >
+                <div className="container" id='services-div'  >
                     <div className="row">
                         <div className="col-md-12">
-                            <h3 className="title text-center">Best Services</h3>
+                            <h1 id='service_title'  className="title text-center">Nos Services</h1>
                             <div className="titleHR"><span></span></div>
                         </div>
                     </div>
@@ -289,10 +306,9 @@ const styles = {
                             <div className="text-center services-item">
                                 <div className="col-wrapper">
                                     <div className="icon-border">
-                                        <img  src={Settings} alt='' style={{height : 50,weight : 50,fill : "orange"}}   />
+                                        <img  src={A1} alt='' style={{height : 50,weight : 50,fill : "orange"}}   />
                                     </div>
-                                    <h5>Creative Ideas</h5>
-                                    <p>Nulla vitae libero pharetra augue. Etiam porta malesuada magna mollis euismod consectetur sem urdom tempus porttitor.</p>
+                                    <h5>Service Qualité</h5>
                                 </div>
                             </div>
                         </div>
@@ -301,10 +317,9 @@ const styles = {
                             <div className="text-center services-item">
                                 <div className="col-wrapper">
                                     <div className="icon-border">
-                                        <img  src={Settings} alt='' style={{height : 50,weight : 50,fill : "orange"}}   />
+                                        <img  src={A2} alt='' style={{height : 50,weight : 50,fill : "orange"}}   />
                                     </div>
-                                    <h5>Rapid Solution</h5>
-                                    <p>Nulla vitae libero pharetra augue. Etiam porta malesuada magna mollis euismod consectetur sem urdom tempus porttitor.</p>
+                                    <h5>Service Ingénieurs d'Application</h5>
                                 </div>
                             </div>
                         </div>
@@ -313,10 +328,9 @@ const styles = {
                             <div className="text-center services-item">
                                 <div className="col-wrapper">
                                     <div className="icon-border">
-                                        <img  src={Settings} alt='' style={{height : 50,weight : 50,fill : "orange"}}   />
+                                        <img  src={A3} alt='' style={{height : 50,weight : 50,fill : "orange"}}   />
                                     </div>
-                                    <h5>Magic Touch</h5>
-                                    <p>Nulla vitae libero pharetra augue. Etiam porta malesuada magna mollis euismod consectetur sem urdom tempus porttitor.</p>
+                                    <h5>Service Aprèes-Vente</h5>
                                 </div>
                             </div>
                         </div>
@@ -327,10 +341,9 @@ const styles = {
                             <div className="text-center services-item">
                                 <div className="col-wrapper">
                                     <div className="icon-border">
-                                        <img  src={Settings} alt='' style={{height : 50,weight : 50,fill : "orange"}}   />
+                                        <img  src={A4} alt='' style={{height : 50,weight : 50,fill : "orange"}}   />
                                     </div>
-                                    <h5>Creative Ideas</h5>
-                                    <p>Nulla vitae libero pharetra augue. Etiam porta malesuada magna mollis euismod consectetur sem urdom tempus porttitor.</p>
+                                    <h5>Contrat de Maintenance Préventive</h5>
                                 </div>
                             </div>
                         </div>
@@ -339,22 +352,9 @@ const styles = {
                             <div className="text-center services-item">
                                 <div className="col-wrapper">
                                     <div className="icon-border">
-                                        <img  src={Settings} alt='' style={{height : 50,weight : 50,fill : "orange"}}   />
+                                        <img  src={A5} alt='' style={{height : 50,weight : 50,fill : "orange"}}   />
                                     </div>
-                                    <h5>Rapid Solution</h5>
-                                    <p>Nulla vitae libero pharetra augue. Etiam porta malesuada magna mollis euismod consectetur sem urdom tempus porttitor.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-sm-4"> 
-                            <div className="text-center services-item">
-                                <div className="col-wrapper">
-                                    <div className="icon-border">
-                                        <img  src={Settings} alt='' style={{height : 50,weight : 50,fill : "orange"}}   />
-                                    </div>
-                                    <h5>Magic Touch</h5>
-                                    <p>Nulla vitae libero pharetra augue. Etiam porta malesuada magna mollis euismod consectetur sem urdom tempus porttitor.</p>
+                                    <h5>Enquête de satisfaction client</h5>
                                 </div>
                             </div>
                         </div>
@@ -363,62 +363,50 @@ const styles = {
             </section>
 
 
-            <section id="about-us"  >
+            <section id="about-us" ref={this.aboutUsRef} >
                 <div className="container" id='services-div'   >
                     <div className="row">
                         <div className="col-md-12">
-                            <h3 className="title text-center">About Us</h3>
+                            <h1 id='about-us-title' className="title text-center">About Us</h1>
                             <div className="titleHR"><span></span></div>
                         </div>
                     </div>
 
-                    <div className="col">
-                        <div className="col-sm-4"> 
-                            <div className="text-center services-item">
-                                <div className="col-wrapper">
-                                    <div className="icon-border">
-                                        <img  src={Person} alt='' style={{height : 150,weight : 150}}   />
-                                    </div>
-                                    <h5>Gregoire Person</h5>
-                                    <p>Nulla vitae libero pharetra augue. Etiam porta malesuada magna mollis euismod consectetur sem urdom tempus porttitor.</p>
+                    
+                    <Box sx={{ flexGrow: 1,marginTop : 5 }}>
+                    <Grid container spacing={2}>
+                            <Grid item xs={5}  >
+                                <div className='left-grid-bg' >
+                                    <div id='analyse_bio_img'  style={{height : 400,width : 500}} />
+                                    
                                 </div>
-                            </div>
-                        </div>
 
-                        <div className="col-sm-4"> 
-                            <div className="text-center services-item">
-                                <div className="col-wrapper">
-                                    <div className="icon-border">
-                                        <img  src={Person} alt='' style={{height : 150,weight : 150}}   />
-                                    </div>
-                                    <h5>Gregoire Person</h5>
-                                    <p>Nulla vitae libero pharetra augue. Etiam porta malesuada magna mollis euismod consectetur sem urdom tempus porttitor.</p>
-                                </div>
-                            </div>
-                        </div>
+                            </Grid>
 
-                        <div className="col-sm-4"> 
-                            <div className="text-center services-item">
-                                <div className="col-wrapper">
-                                    <div className="icon-border">
-                                        <img  src={Person} alt='' style={{height : 150,weight : 150}}   />
-                                    </div>
-                                    <h5>Gregoire Person</h5>
-                                    <p>Nulla vitae libero pharetra augue. Etiam porta malesuada magna mollis euismod consectetur sem urdom tempus porttitor.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div> 
+                        <Grid item xs={4}>
+                            <div className='about-us-text-container'  style={{marginLeft: "30%",height : 400,width : 580}} >
 
+                                <p className='about-us-text' >
+                                    La société Diagnostic Systems a été fondée en Avril 2005 par M. Mohamed LAHJOUJI. Bénéficiant d’une expérience de plus de 17 ans dans le secteur de la biologie, ce leader a pour trait principal de caractère : la Persévérance.
+                                </p>
+                                <p className='about-us-text'>
+                                Spécialisée dans l'importation et la distribution des automates , matériel et consommables de laboratoire, Diagnostic Systems est une société à taille humaine qui sera toujours à votre écoute pour répondre, de façon personnalisée et avec le plus grand soin, à l'ensemble de vos requêtes techniques et commerciales.
+                                </p>
+
+                            </div>
+                        </Grid>
+
+                    </Grid>
+                    </Box>
                     
                 </div> 
             </section>
 
-                <section id="contact">
+                <section id="contact" ref={this.contactRef} >
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
-                                <h3 className="title text-center">Contact Us</h3>
+                                <h1 id='contact-title'  className="title text-center">Contacter-nous</h1>
                                 <div className="titleHR"><span></span></div>
 
                                 <Form id='form' noValidate validated={this.state.validated} onSubmit={this.handleSubmit}>
@@ -493,15 +481,15 @@ const styles = {
                                         </InputGroup>
                                         <br />
                                         <Button id='submit' type='submit' style={{
-                                            backgroundColor : 'rgb(16, 19, 18)',
-                                            borderColor :'rgb(16, 19, 18)'
+                                            backgroundColor : 'rgb(23, 102, 167)',
+                                            borderColor :'rgb(23, 102, 167)'
                                         }}
                                             onMouseEnter={(e)=> {
                                                 e.currentTarget.style.backgroundColor = "white";
                                                 e.currentTarget.style.color = "black"
                                             }}
                                             onMouseLeave={(e)=>{
-                                                e.currentTarget.style.backgroundColor = 'rgb(16, 19, 18)';
+                                                e.currentTarget.style.backgroundColor = 'rgb(23, 102, 167)';
                                                 e.currentTarget.style.color = "white"
                                             }}
                                          >Envoyer</Button>
@@ -517,26 +505,35 @@ const styles = {
                     <div className="footer-widgets-wrap">
                         <div className="container text-center">
                             <div className="row">
-                                <div className="col-sm-4 col-md-4">
+                                
+                                <div className="col col-md-4">
                                     <div className="footer-content">
-                                        <h4>Voir nous sur</h4>
-                                        <div className="footer-socials">
-                                            <a href="#"><i className="fa fa-facebook"></i></a>
-                                            <a href="#"><i className="fa fa-google-plus"></i></a>
-                                            <a href="#"><i className="fa fa-twitter"></i></a>
-                                            <a href="#"><i className="fa fa-pinterest"></i></a>
+                                        <h1>Contact</h1>
+                                        <br />
+                                        <div className='footer-content-div'  >
+                                            <BsTelephoneFill className='icon_size'  />
+                                            <p>05 22 89 88 37 / 05 22 93 81 82</p>
+                                        </div>
+                                        <div className='footer-content-div'  >
+                                            <FaFax className='icon_size'  />
+                                            <p>05 22 93 81 83</p>
+                                        </div>
+                                        <div className='footer-content-div'  >
+                                            <GrMail className='icon_size'  />
+                                            <p>contact@diagnosticsystems.ma</p>
+                                        </div>
+                                        <div id='gps-pos' className='footer-content-div'  >
+                                            <GiPositionMarker  className='icon_size'  />
+                                            <p>234, QUARTIER NASSIM-LISSASSFA HAY HASSANI-CASABLANCA</p>
+                                        </div>
+                                        <div  className='footer-content-div'  >
+                                            <BsLinkedin  className='icon_size'  />
+                                            <a id='linkedin_ref' target={'_blank'}  href="https://www.linkedin.com/company/diagnosticsystems/">Diagnostic Systems, s.a.r.l</a>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-sm-4 col-md-4">
-                                    <div className="footer-content">
-                                        <h4>ADDRESS</h4>
-                                        <p>577, Route de Casa <br />
-                                            Settat</p>
-                                        <p>+212577829502</p>
-                                    </div>
-                                </div>
-                                <div className="col-sm-4 col-md-4">
+                                <div style={{marginLeft: "20%",marginTop: "3%"}}  className="col-sm-2 col-md-2">
+                                    <h1>Localisation</h1>
                                     <div className="footer-content">
                                         <Map />
                                     </div>
