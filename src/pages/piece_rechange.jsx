@@ -6,7 +6,7 @@ import {AiFillCloseCircle} from "react-icons/ai"
 import $ from 'jquery'
 import { withRouter } from '../js/withRouter'
 import getData from "../api/getData"
-
+import deleteData from '../api/deleteData'
  class Piece_Rechange extends Component {
 
     constructor(props){
@@ -65,7 +65,7 @@ import getData from "../api/getData"
                                 onChange={(inputValue)=>{
                                     if(inputValue.target.value.length != 0){
                                         var list = this.state.piece_rechange_liste.filter((value)=>{
-                                            if(value.nom_piece.search(inputValue.target.value) !=-1){
+                                            if(value.nomPiece.search(inputValue.target.value) !=-1){
                                                 return value
                                             }
                                             
@@ -98,7 +98,32 @@ import getData from "../api/getData"
                                         <td>{value.nomPiece}</td>
                                         <td>{value.marquePiece}</td>
                                         <td>
-                                            <Button onClick={()=> this.props.navigate(`/modifier_piece/${value.idPiece}`)} >modifier</Button>
+                                            {typeof JSON.parse(localStorage.getItem("user")).admin != 'undefined' && JSON.parse(localStorage.getItem("user")).admin === 1 ? 
+                                                <Button onClick={()=> this.props.navigate(`/modifier_piece/${value.idPiece}`)} >modifier</Button>
+                                            :null}                                            
+                                            { typeof JSON.parse(localStorage.getItem("user")).admin != 'undefined' && JSON.parse(localStorage.getItem("user")).admin === 1 ?
+                                                <Button variant='danger' onClick={(e)=> {
+                                                const data = deleteData(`piece_rechange/${value.idPiece}`,{
+                                                    email : JSON.parse(localStorage.getItem("user")).email
+                                                })
+                                                data.then((res)=>{
+                                                    if(res.status == 200){
+                                                        res.json().then((res)=>{
+                                                            console.log(res)
+                                                        })
+                                                        window.location.reload()
+                                                    }
+                                                    else {
+                                                    res.json().then((res2)=>{
+                                                        window.alert(res2.message);
+                                                    })
+                                                    .catch((e)=>console.log("error in res.json"))
+                                                    }
+                                                })
+                                                } }  >supprimer</Button>
+                                                :null
+                                            }
+                                            
                                         </td>
                                     </tr>
                                 )

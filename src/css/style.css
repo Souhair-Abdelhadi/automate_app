@@ -239,6 +239,13 @@ section {
 
 /* 5 Navigation
 ----------------------------------------------------------------------------- */
+#index_logo {
+	cursor: pointer;
+}
+#index_logo:hover {
+	color: white;
+	transition: 500ms ease-in-out;
+}
 .l_navbar-custom {
 	height: 60px !important;
 	background-color: rgb(23, 102, 167) !important;

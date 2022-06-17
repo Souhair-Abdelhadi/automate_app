@@ -6,6 +6,18 @@ import {AiFillCloseCircle} from "react-icons/ai"
 import $ from 'jquery'
 import { withRouter } from '../js/withRouter'
 import getData from '../api/getData'
+import pdfMake from 'pdfmake/build/pdfmake'
+import pdfFonts from 'pdfmake/build/vfs_fonts'
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.fonts = {
+    'Roboto' : {
+        normal : 'Roboto-Regular.ttf',
+        bold : 'Roboto-Medium.ttf',
+        italics : 'Roboto-Italic.ttf',
+        bolditalics : 'Roboto-Italic.ttf'
+    }
+}
 
  class Interventions extends Component {
 
@@ -16,7 +28,8 @@ import getData from '../api/getData'
             interventions_liste : [],
             liste_loaded : false,
             list_to_show : [],
-            description : ''
+            description : '',
+            piecesListe : []
         }
         
     }
@@ -50,11 +63,122 @@ import getData from '../api/getData'
         }
       }
 
+      showPieces = (idInter) => {
+        const data = getData(`pieces_automate_intervention/${idInter}`,null,"get")
+        data.then((res)=>{
+            if(res.status == "OK"){
+                this.setState({piecesListe :  res.doc})
+                $('#piece_div').toggle()
+            }
+            else {
+                console.log(res.message)
+            }
+        })
+        .catch(e=>console.log(e.message))
+      }
 
       closeDescription = (e) => {
           this.setState({description : e})
           $('#image_div').toggle()
       }
+
+      pdfContent = (sections,pageWidth,pageHeight) => {
+        const pageSize = {
+            width : pageWidth * 50,
+            height : pageHeight * 30
+        }
+        const pageMargins = [5,5,40,60]
+        let content = []
+        sections.forEach((section,si)=>{
+
+            content.push({
+                text : 'Diagnostic Systems \t Fiche d\'intervention ',
+                fontSize : 40,
+                alignment : 'left',
+                margin : [30,30],
+                pageBreak : si === 0 ? null : 'before'
+            })
+
+            content.push({
+                text : 'Nom labo : '+section.nom_labo,
+                fontSize : 18,
+                alignment : 'left',
+                margin : [15,15],
+                pageBreak : si === 0 ? null : 'before'
+            })
+
+            content.push({
+                text : 'Id d\'intervention : '+section.idInter,
+                fontSize : 18,
+                alignment : 'left',
+                margin : [15,15],
+                pageBreak : si === 0 ? null : 'before'
+            })
+            content.push({
+                text : 'Id d\'automate : '+section.id_automate,
+                fontSize : 18,
+                alignment : 'left',
+                margin : [15,15],
+                pageBreak : si === 0 ? null : 'before'
+            })
+            content.push({
+                text : 'Id d\'ingénieur : '+section.id_ing,
+                fontSize : 18,
+                alignment : 'left',
+                margin : [15,15],
+                pageBreak : si === 0 ? null : 'before'
+            })
+            content.push({
+                text : 'Date d\'intervention : '+ this.formatDate(section.date_inter),
+                fontSize : 18,
+                alignment : 'left',
+                margin : [15,15],
+                pageBreak : si === 0 ? null : 'before'
+            })
+            content.push({
+                text : 'Durée d\'intervention : '+section.duree_inter + ' heure(s)',
+                fontSize : 18,
+                alignment : 'left',
+                margin : [15,15],
+                pageBreak : si === 0 ? null : 'before'
+            })
+            content.push({
+                text : 'Description  : '+section.description,
+                fontSize : 18,
+                alignment : 'left',
+                margin : [15,15],
+                pageBreak : si === 0 ? null : 'before'
+            })
+        })
+        return {
+            pageSize,content,pageMargins
+        }
+      }
+
+      printPdf = (sections,pageWidth,pageHeight,type) => {
+        const {pageSize,content,pageMargins} = this.pdfContent(sections,pageWidth,pageHeight)
+        const docDefinition = {
+            pageSize,
+            content : content,
+            pageMargins,
+            footer : function(currentPage,pageCount){
+                return {
+                    text : "Page "+ currentPage.toString() + ' of '+pageCount,
+                    alignment : 'left' ,
+                    style : 'normalText',
+                    margin : [10,10,10,10]
+                }
+            }
+        }
+        console.log(docDefinition)
+        if(type === "print"){
+            pdfMake.createPdf(docDefinition).print()
+        }
+        if(type === "open"){
+            pdfMake.createPdf(docDefinition).open({},window) 
+        }
+      }
+
 
     componentDidMount(){
         const data = getData("interventions?email="+JSON.parse(localStorage.getItem("user")).email+"&admin="+JSON.parse(localStorage.getItem("user")).admin,null,"get")
@@ -80,6 +204,17 @@ import getData from '../api/getData'
                         <h4> Description de l'intervention </h4>
                         <div className='description_text' >
                             <p> {this.state.description} </p>
+                        </div>
+                    </div>
+                </div>
+                <div className='image_div' id='piece_div'  >
+                <AiFillCloseCircle  className='close_icon' onClick={()=> $('#piece_div').toggle()} />
+                    <div className="description_modal">
+                        <h4> Pieces de rechanges utiliser  </h4>
+                        <div className='description_text' >
+                            {this.state.piecesListe.length != 0 ? this.state.piecesListe.map((value,index)=>{
+                              return  <p> {"Nom de Piece : "+value.nomPiece+ " , "+ "marque de Piece : "+value.marquePiece} </p>
+                            }) : <p>Rien utiliser</p> }
                         </div>
                     </div>
                 </div>
@@ -127,7 +262,8 @@ import getData from '../api/getData'
                                 <th>Nom ing</th>
                                 <th>Date intervention</th>
                                 <th>Duree intervention</th>
-                                <th>Description</th>
+                                <th>Pieces de rechanges</th>
+                                <th>Fiche</th>
                                 <th>Les actions</th>
                             </tr>
                         </thead>
@@ -140,11 +276,19 @@ import getData from '../api/getData'
                                         <td>{value.nomAutomate}</td>
                                         <td>{value.nomIng}</td>
                                         <th>{ this.formatDate(value.date_inter) }</th>
-                                        <th>{value.duree_inter}</th>
-                                        <th><Button variant='info' onClick={()=> this.closeDescription(value.description) }   >Voir</Button></th>
-
+                                        <th>{value.duree_inter+" heure(s)"}</th>
+                                        <th><Button variant='info' onClick={()=> this.showPieces(value.idInter) }   >Voir</Button></th>
+                                        <th><Button style={{backgroundColor : 'green'}}  
+                                            onClick={()=> this.printPdf([this.state.list_to_show[index]],20,20,"open") } >voir</Button>
+                                        </th>
                                         <td>
-                                            <Button onClick={()=> this.props.navigate(`/modifier_intervention/${value.idInter}`)} >Modifier</Button>
+                                            {typeof JSON.parse(localStorage.getItem("user")).admin != 'undefined' && JSON.parse(localStorage.getItem("user")).admin === 1 ?
+                                                <Button onClick={()=> this.props.navigate(`/modifier_intervention/${value.idInter}`)} >Modifier</Button>
+                                                :null
+                                            }
+                                            <Button style={{backgroundColor : 'green'}}  
+                                             onClick={()=> this.printPdf([this.state.list_to_show[index]],20,20,"print") } >imprimer</Button>
+
                                         </td>
                                     </tr>
                                 )

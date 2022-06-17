@@ -19,6 +19,7 @@ import getData from '../../api/getData'
             password : '',
             specialite : '',
             admin : 0,
+            bloquer : '',
             idIng : parseInt(props.params.id),
             numPhoneValide : false,
         }
@@ -43,11 +44,12 @@ import getData from '../../api/getData'
             const dataPromise = putData(`ingenieur/${this.state.idIng}`,{
                 nomIng : this.state.nomIng,
                 numIng : this.state.numIng,
-                email : this.state.email,
+                target_email : this.state.email,
                 password : this.state.password,
                 specialite : this.state.specialite,
                 admin : this.state.admin,
-                email : JSON.parse(localStorage.getItem('user')).email
+                email : JSON.parse(localStorage.getItem('user')).email,
+                bloquer : this.state.bloquer
                 
             })
             
@@ -129,6 +131,7 @@ import getData from '../../api/getData'
                         password : res.doc[0].password,
                         specialite : res.doc[0].specialite,
                         admin : res.doc[0].admin,
+                        bloquer : res.doc[0].bloquer
                      })         
                      this.validePhone("0"+ res.doc[0].numIng)       
                 }
@@ -256,7 +259,20 @@ import getData from '../../api/getData'
                                 <option selected={ this.state.admin == 1 ? true :false } className='option_text' value={1} > Oui </option>
                             </Form.Select>
                             <Form.Control.Feedback className='feed_back' type="invalid">
-                                S'il vous plait entrée donner responsabilié.
+                                S'il vous plait donner responsabilié.
+                            </Form.Control.Feedback>
+                        </InputGroup>
+                        <br />
+                        <InputGroup className='input_group' hasValidation>
+                            <InputGroup.Text id="inputGroup-sizing-lg">Bloquer</InputGroup.Text>
+                            <Form.Select
+                                onChange={(e) => this.setState({bloquer : e.target.value})}
+                                aria-label="Default select example">
+                                <option  className='option_text' value={0} > Non </option>
+                                <option selected={ this.state.bloquer == 1 ? true :false } className='option_text' value={1} > Oui </option>
+                            </Form.Select>
+                            <Form.Control.Feedback className='feed_back' type="invalid">
+                                S'il vous plait donner l'état d'access.
                             </Form.Control.Feedback>
                         </InputGroup>
                         <br />

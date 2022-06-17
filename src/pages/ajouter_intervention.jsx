@@ -72,7 +72,7 @@ export default class Ajouter_Intervention extends Component {
                     })
                     .catch(e => console.log(e))
                     $("#form").trigger('reset')
-                    const data = getData("automates?email="+JSON.parse(localStorage.getItem("user")).email,null,"get")
+                    const data = getData("automates?email="+JSON.parse(localStorage.getItem("user")).email+"&admin="+JSON.parse(localStorage.getItem("user")).admin,null,"get")
                     data.then((res) => {
                         if (res.status = "OK") {
                             this.setState({ automate_list_to_show: res.doc, automate_list: res.doc, id_automate: res.doc[0].idAutomate })
@@ -184,7 +184,7 @@ export default class Ajouter_Intervention extends Component {
       }
 
     componentDidMount(){
-        const data = getData("automates?email="+JSON.parse(localStorage.getItem("user")).email,null,"get")
+        const data = getData("automates?email="+JSON.parse(localStorage.getItem("user")).email+"&admin="+JSON.parse(localStorage.getItem("user")).admin,null,"get")
         data.then((res)=>{
             if(res.status = "OK"){
                 this.setState({automate_list_to_show : res.doc,automate_list : res.doc,id_automate : res.doc[0].idAutomate})
@@ -268,7 +268,7 @@ export default class Ajouter_Intervention extends Component {
                                 onChange={(e) => this.setState({ duree_inter: e.target.value })}
                                 className='input_text'
                                 type="text"
-                                placeholder="Nombre de jours"
+                                placeholder="Nombre de heure(s)"
                                 aria-describedby="inputGroupPrepend"
                                 required
                             />

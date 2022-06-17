@@ -18,6 +18,7 @@ import getData from '../../api/getData'
             ville : '',
             adresse : '',
             numPhone : '',
+            bloquer : '',
             idLabo :  parseInt(props.params.id),
             numPhoneValide : false,
         }
@@ -49,7 +50,8 @@ import getData from '../../api/getData'
                 ville : this.state.ville,
                 adresse : this.state.adresse,
                 numPhone : this.state.numPhone,
-                email : JSON.parse(localStorage.getItem('user')).email
+                email : JSON.parse(localStorage.getItem('user')).email,
+                bloquer : this.state.bloquer
 
             })
             dataPromise.then((res)=>{
@@ -118,6 +120,7 @@ import getData from '../../api/getData'
                         ville : res.doc[0].ville,
                         adresse : res.doc[0].adresse,
                         numPhone : "0" + res.doc[0].numPhone,
+                        bloquer : res.doc[0].bloquer
                      })                
                 }
             }
@@ -212,6 +215,19 @@ import getData from '../../api/getData'
                             />
                             <Form.Control.Feedback className='feed_back' type="invalid">
                                 S'il vous plait entrée une adresse.
+                            </Form.Control.Feedback>
+                        </InputGroup>
+                        <br />
+                        <InputGroup className='input_group' hasValidation>
+                            <InputGroup.Text id="inputGroup-sizing-lg">Bloquer</InputGroup.Text>
+                            <Form.Select
+                                onChange={(e) => this.setState({bloquer : e.target.value})}
+                                aria-label="Default select example">
+                                <option  className='option_text' value={0} > Non </option>
+                                <option selected={ this.state.bloquer == 1 ? true :false } className='option_text' value={1} > Oui </option>
+                            </Form.Select>
+                            <Form.Control.Feedback className='feed_back' type="invalid">
+                                S'il vous plait donner l'état de client.
                             </Form.Control.Feedback>
                         </InputGroup>
                         <br />

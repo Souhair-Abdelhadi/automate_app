@@ -16,6 +16,7 @@ class Modifier_Piece_Rechange extends Component {
             validated : false,
             nom_piece : '',
             marque_piece : '',
+            supprimer : '',
             idPiece : props.params.id
         }
         
@@ -79,6 +80,7 @@ class Modifier_Piece_Rechange extends Component {
                     this.setState({
                         nom_piece : res.doc[0].nomPiece,
                         marque_piece : res.doc[0].marquePiece,
+                        supprimer : res.doc[0].supprimer
                      })                
                 }
             }
@@ -138,7 +140,19 @@ class Modifier_Piece_Rechange extends Component {
                             </Form.Control.Feedback>
                         </InputGroup>
                         <br />
-                        
+                        <InputGroup className='input_group' hasValidation>
+                            <InputGroup.Text id="inputGroup-sizing-lg">Supprimer</InputGroup.Text>
+                            <Form.Select
+                                onChange={(e) => this.setState({supprimer : e.target.value})}
+                                aria-label="Default select example">
+                                <option  className='option_text' value={0} > Non </option>
+                                <option selected={ this.state.supprimer == 1 ? true :false } className='option_text' value={1} > Oui </option>
+                            </Form.Select>
+                            <Form.Control.Feedback className='feed_back' type="invalid">
+                                S'il vous plait entrée donner responsabilié.
+                            </Form.Control.Feedback>
+                        </InputGroup>
+                        <br />
                         <Button id='submit' type='submit' variant="primary">Modifier</Button>
 
                     </Form.Group>

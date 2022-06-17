@@ -6,7 +6,7 @@ import {AiFillCloseCircle} from "react-icons/ai"
 import $ from 'jquery'
 import { withRouter } from '../js/withRouter'
 import getData from "../api/getData"
-
+import deleteData from '../api/deleteData'
 class Ingenieurs extends Component {
 
     constructor(props){
@@ -104,6 +104,22 @@ class Ingenieurs extends Component {
                                         <td>{value.admin === 1 ? "Oui" : "Non" }</td>
                                         <td>
                                             <Button onClick={()=>  this.redirect("/modifier_ingenieur/"+value.idIng)} >Modifier</Button>
+                                            <Button variant='danger' onClick={()=> {
+                                               const data = deleteData(`ingenieur/${value.idAutomate}`,{
+                                                email : JSON.parse(localStorage.getItem("user")).email
+                                               })
+                                               data.then((res)=>{
+                                                if(res.status == 200){
+                                                    window.location.reload()
+                                                }
+                                                else {
+                                                   res.json().then((res2)=>{
+                                                    window.alert(res2.message);
+                                                   })
+                                                   .catch((e)=>console.log("error in res.json"))
+                                                }
+                                               })
+                                            } }  >supprimer</Button>
                                         </td>
                                     </tr>
                                 )

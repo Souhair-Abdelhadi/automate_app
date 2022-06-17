@@ -240,9 +240,15 @@ export default class Ajouter_Automate extends Component {
                             <InputGroup.Text   id="inputGroup-sizing-lg">Labo </InputGroup.Text>
                             <Form.Select 
                                 required
-                                aria-label="Default select example">
+                                aria-label="Default select example"
+                                onChange={(e)=> {
+                                    this.setState({idLabo : e.target.value })
+                                    console.log("id labo : ",e.target.value)
+                                }}
+                                >
+                                
                                 {this.state.labo_list_to_show.map((value,index)=>{
-                                    return <option  className='option_text' key={index} value={value.idLabo} onChange={()=> this.setState({idLabo : value.idLabo })}  > {value.nom_labo} </option>
+                                    return <option  className='option_text' key={index} value={value.idLabo}   > {value.nom_labo} </option>
                                 
                                 })}
                             </Form.Select>
